@@ -188,7 +188,6 @@ class Receiver final : public TeensyDMX {
     uint32_t breakTime;  // BREAK time, in microseconds
     uint32_t mabTime;    // MAB time, in microseconds
 
-   private:
     // An accumulator for extra bytes beyond the max. packet length.
     // This is private for now because the value may not be in sync
     // by the time a user retrieves the packet info.
@@ -197,6 +196,8 @@ class Receiver final : public TeensyDMX {
     // off early. Thus, an actual overflow occurs when
     // size + extraSize >= kMaxDMXPacketSize.
     int extraSize;  // Size beyond kMaxDMXPacketSize
+
+   private:
 
     // Store the 'next' values to solve the one-ahead problem of completing the
     // packet on the next BREAK (or timeout or size limit)
@@ -221,6 +222,18 @@ class Receiver final : public TeensyDMX {
     constexpr ErrorStats()
         : packetTimeoutCount(0),
           framingErrorCount(0),
+          framingErrorCount1(0),
+          framingErrorCount2(0),
+          framingErrorCount3a(0),
+          framingErrorCount3b(0),
+          framingErrorCount4(0),
+          framingErrorCount5(0),
+          framingErrorCount6(0),
+          framingErrorCount7(0),
+          framingErrorCount8(0),
+          framingErrorCount9(0),
+          framingErrorCount10(0),
+          framingErrorCount11(0),
           shortPacketCount(0),
           longPacketCount(0) {}
 
@@ -233,7 +246,21 @@ class Receiver final : public TeensyDMX {
     ErrorStats &operator=(ErrorStats &&) = default;
 
     uint32_t packetTimeoutCount;
+
     uint32_t framingErrorCount;
+    uint32_t framingErrorCount1;
+    uint32_t framingErrorCount2;
+    uint32_t framingErrorCount3a;
+    uint32_t framingErrorCount3b;
+    uint32_t framingErrorCount4;
+    uint32_t framingErrorCount5;
+    uint32_t framingErrorCount6;
+    uint32_t framingErrorCount7;
+    uint32_t framingErrorCount8;
+    uint32_t framingErrorCount9;
+    uint32_t framingErrorCount10;
+    uint32_t framingErrorCount11;
+
     uint32_t shortPacketCount;
     uint32_t longPacketCount;
   };
@@ -500,7 +527,7 @@ class Receiver final : public TeensyDMX {
   // An invalid start-of-BREAK was received or there were too few stop bits.
   // There were non-zero bytes in the framing error.
   // This is called from an ISR.
-  void receiveBadBreak();
+  void receiveBadBreak(int type);
 
   // Receives a byte. The `eopTime` parameter is the timestamp of the end of the
   // character, in microseconds.

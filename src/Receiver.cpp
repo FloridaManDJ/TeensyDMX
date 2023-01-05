@@ -624,14 +624,14 @@ void Receiver::receiveIdle(uint32_t eventTime) {
         }
         if ((mabStartTime_ - breakStartTime_) < kMinBreakTime) {
           seenMABStart_ = false;
-          receiveBadBreak();
+          receiveBadBreak(1);
           return;
         }
       } else {
         // This catches the case where a short BREAK is followed by a longer MAB
         if ((eventTime - breakStartTime_) < kMinBreakTime + kCharTimeLow) {
           seenMABStart_ = false;
-          receiveBadBreak();
+          receiveBadBreak(2);
           return;
         }
 
@@ -689,11 +689,47 @@ void Receiver::receivePotentialBreak(uint32_t eventTime) {
   }
 }
 
-void Receiver::receiveBadBreak() {
+void Receiver::receiveBadBreak(int type) {
   intervalTimer_.end();
 
   // Not a BREAK
   errorStats_.framingErrorCount++;
+  if (type == 1) {
+    errorStats_.framingErrorCount1++;
+  }
+  if (type == 2) {
+    errorStats_.framingErrorCount2++;
+  }
+  if (type == 31) {
+    errorStats_.framingErrorCount3a++;
+  }
+  if (type == 32) {
+    errorStats_.framingErrorCount3b++;
+  }
+  if (type == 4) {
+    errorStats_.framingErrorCount4++;
+  }
+  if (type == 5) {
+    errorStats_.framingErrorCount5++;
+  }
+  if (type == 6) {
+    errorStats_.framingErrorCount6++;
+  }
+  if (type == 7) {
+    errorStats_.framingErrorCount7++;
+  }
+  if (type == 8) {
+    errorStats_.framingErrorCount8++;
+  }
+  if (type == 9) {
+    errorStats_.framingErrorCount9++;
+  }
+  if (type == 10) {
+    errorStats_.framingErrorCount10++;
+  }
+  if (type == 11) {
+    errorStats_.framingErrorCount11++;
+  }
   std::atomic_signal_fence(std::memory_order_release);
 
   // Don't keep the packet
@@ -726,9 +762,13 @@ void Receiver::receiveByte(uint8_t b, uint32_t eopTime) {
         seenMABStart_ = false;
         if (seenMABEnd_) {
           mabTime = mabEndTime_ - mabStartTime_;
-          if ((mabStartTime_ - breakStartTime_ < kMinBreakTime) ||
-              (mabTime < kMinMABTime)) {
-            receiveBadBreak();
+          if (mabStartTime_ - breakStartTime_ < kMinBreakTime) {
+            // 
+            receiveBadBreak(31);
+            return;
+          }
+          if (mabTime < kMinMABTime) {
+            receiveBadBreak(32);
             return;
           }
         } else {
@@ -737,7 +777,7 @@ void Receiver::receiveByte(uint8_t b, uint32_t eopTime) {
           }
           if ((mabStartTime_ - breakStartTime_ < kMinBreakTime) ||
               (eopTime - mabStartTime_ < kMinMABTime + kCharTimeLow)) {
-            receiveBadBreak();
+            receiveBadBreak(4);
             return;
           }
           mabTime = eopTime - kCharTime - mabStartTime_;
@@ -755,7 +795,7 @@ void Receiver::receiveByte(uint8_t b, uint32_t eopTime) {
         if ((eopTime - breakStartTime_) <
             kMinBreakTime + kMinMABTime + kCharTimeLow) {
           // First byte is too early, discard any data
-          receiveBadBreak();
+          receiveBadBreak(5);
           return;
         }
         receiveHandler_->setILT(true);  // IDLE detection to "after stop bit"
@@ -808,7 +848,7 @@ void Receiver::receiveByte(uint8_t b, uint32_t eopTime) {
       uint32_t charTime = kCharTimeLow*(1 + activeBufIndex_);
       if (eopTime - breakStartTime_ < kMinBreakTime + kMinMABTime + charTime) {
         // First byte is too early, discard any data
-        receiveBadBreak();
+        receiveBadBreak(6);
         return;
       }
       // NOTE: Don't need to check for inter-slot MARK time being

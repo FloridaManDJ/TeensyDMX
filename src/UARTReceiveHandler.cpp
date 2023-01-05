@@ -163,7 +163,7 @@ void UARTReceiveHandler::irqHandler() const {
     if (port_->D == 0) {
       receiver_->receivePotentialBreak(eventTime);
     } else {
-      receiver_->receiveBadBreak();
+      receiver_->receiveBadBreak(8);
     }
     return;
   }
@@ -203,7 +203,7 @@ void UARTReceiveHandler::irqHandler() const {
           // Check that the 9th bit is high; used as the first stop bit
           if (!errFlag && (port_->C3 & UART_C3_R8) == 0) {
             errFlag = true;
-            receiver_->receiveBadBreak();
+            receiver_->receiveBadBreak(9);
           }
 #endif  // __MK20DX128__ || __MK20DX256__
           receiver_->receiveByte(port_->D, timestamp += kCharTime);
@@ -211,7 +211,7 @@ void UARTReceiveHandler::irqHandler() const {
         port_->S1;
 #if defined(__MK20DX128__) || defined(__MK20DX256__)
         if (!errFlag && (port_->C3 & UART_C3_R8) == 0) {
-          receiver_->receiveBadBreak();
+          receiver_->receiveBadBreak(10);
         }
 #endif  // __MK20DX128__ || __MK20DX256__
         receiver_->receiveByte(port_->D, timestamp + kCharTime);
@@ -227,7 +227,7 @@ void UARTReceiveHandler::irqHandler() const {
 #if defined(__MK20DX128__) || defined(__MK20DX256__)
       // Check that the 9th bit is high; used as the first stop bit
       if ((port_->C3 & UART_C3_R8) == 0) {
-        receiver_->receiveBadBreak();
+        receiver_->receiveBadBreak(11);
       }
 #endif  // __MK20DX128__ || __MK20DX256__
       receiver_->receiveByte(port_->D, eventTime);
