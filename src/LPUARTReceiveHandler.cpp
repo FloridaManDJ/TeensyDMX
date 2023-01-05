@@ -115,7 +115,7 @@ void LPUARTReceiveHandler::irqHandler() const {
     if ((port_->DATA & 0xff) == 0) {
       receiver_->receivePotentialBreak(eventTime);
     } else {
-      receiver_->receiveBadBreak();
+      receiver_->receiveBadBreak(0);
     }
     return;
   }
