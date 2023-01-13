@@ -635,9 +635,11 @@ void Receiver::receiveIdle(uint32_t eventTime) {
           return;
         }
 
-        // We can infer what the rise time is here
-        seenMABStart_ = true;
-        mabStartTime_ = eventTime - kCharTime;
+        if (rxWatchPin_ < 0) {
+          // We can infer what the rise time is here
+          seenMABStart_ = true;
+          mabStartTime_ = eventTime - kCharTime;
+        }
         receiveHandler_->setILT(true);  // IDLE detection to "after stop bit"
       }
       break;
