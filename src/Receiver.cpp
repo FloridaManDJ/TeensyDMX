@@ -847,11 +847,13 @@ void Receiver::receiveByte(uint8_t b, uint32_t eopTime) {
     case RecvStates::kData: {
       // Checking this here accounts for buffered input, where several
       // bytes come in at the same time
-      uint32_t charTime = kCharTimeLow*(1 + activeBufIndex_);
-      if (eopTime - breakStartTime_ < kMinBreakTime + kMinMABTime + charTime) {
-        // First byte is too early, discard any data
-        receiveBadBreak(6);
-        return;
+      if (activeBufIndex_ == 0) {
+        uint32_t charTime = kCharTimeLow*(1 + activeBufIndex_);
+        if (eopTime - breakStartTime_ < kMinBreakTime + kMinMABTime + charTime) {
+          // First byte is too early, discard any data
+          receiveBadBreak(6);
+          return;
+        }
       }
       // NOTE: Don't need to check for inter-slot MARK time being
       //       too large because the IDLE detection will catch that
