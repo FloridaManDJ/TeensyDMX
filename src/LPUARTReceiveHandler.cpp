@@ -44,6 +44,14 @@ void LPUARTReceiveHandler::start() {
     port_->CTRL = LPUART_CTRL_RX_ENABLE | LPUART_CTRL_FEIE;
   }
 
+  // Set the receive watermark to zero. The default was 2. It ensures that
+  // an interrupt is generated for every byte received. This increases the CPU
+  // workload of the processor slightly, but the measured timing (especially
+  // the first byte of a packet) will be more accurate, thereby reducing the
+  // likelihood of a framing error. Not sure if this is a permanent fix or
+  // just a band-aid. Need to test more to be certain.
+  port_->WATER &= 0xFFFCFFFF;
+
   // Start counting IDLE after the start bit
   setILT(false);
 
