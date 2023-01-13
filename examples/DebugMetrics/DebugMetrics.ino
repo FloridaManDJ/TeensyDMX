@@ -123,12 +123,26 @@ void debugErrorStats() {
 void debugPacketStats() {
     // Serial.printf("Packet size:     %d\n", packetStats.size);
     // Serial.printf("Is short?  :     %d\n", packetStats.isShort);
-    Serial.printf("Break+MAB time   %d\n", packetStats.breakPlusMABTime);
-    Serial.printf("Break to Break:  %d\n", packetStats.breakToBreakTime);
-    Serial.printf("Break time:      %d\n", packetStats.breakTime);
-    Serial.printf("MAB time:        %d\n", packetStats.mabTime);
-    Serial.printf("Frame timestamp: %d\n", packetStats.frameTimestamp);
-    Serial.printf("Packet time:     %d\n", packetStats.packetTime);
-    Serial.printf("ExtraSize:       %d\n", packetStats.extraSize);
-    Serial.println("");
+    if (packetStats.breakPlusMABTime < 88 + 8) {
+      Serial.printf("Break+MAB time   %d\n", packetStats.breakPlusMABTime);
+    }
+    // Serial.printf("Break to Break:  %d\n", packetStats.breakToBreakTime);
+
+    if (packetStats.breakTime < 88) {
+      Serial.printf("Break time:      %d\n", packetStats.breakTime);
+    }
+
+    if (packetStats.mabTime < 8) {
+      Serial.printf("MAB time<8:      %d\n", packetStats.mabTime);
+      while (1) {
+        
+      }
+    }
+
+    // Serial.printf("Frame timestamp: %d\n", packetStats.frameTimestamp);
+    // Serial.printf("Packet time:     %d\n", packetStats.packetTime);
+    if (packetStats.extraSize > 0) {
+      Serial.printf("ExtraSize:       %d\n", packetStats.extraSize);
+    }
+    // Serial.println("");
 }
